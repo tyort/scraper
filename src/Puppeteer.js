@@ -34,8 +34,6 @@ class Puppeteer {
       throw err;
     }
   }
-
-
 }
 
 module.exports = {
