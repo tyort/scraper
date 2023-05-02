@@ -19,7 +19,9 @@ const puppeteer= new Puppeteer();
     const content = await puppeteer.getPageContent(url);
     const $ = scraper.getAnalyzedData(content);
     const adaptedData = adapter.getContent($);
-    const translatedData = await translator.getTranslation(adaptedData);
+    const untranslatableContent = adapter.getUntranslatableContent($);
+    let translatedData = await translator.getTranslation(adaptedData);
+    translatedData = { ...translatedData, images: untranslatableContent }
     console.log(translatedData);
   } catch(err) {
     console.log(err)
