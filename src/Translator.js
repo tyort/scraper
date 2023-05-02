@@ -6,8 +6,9 @@ class Translator {
 
   async getTranslation(content) {
     const totalUrl = `${this.url}${encodeURI(content)}`;
-    const translatedContent = await axios(totalUrl);
-    return JSON.parse(translatedContent.data[0][0][0]);
+    const response = await axios(totalUrl);
+    // const translation = JSON.parse(response.data[0][0][0]);
+    return response.data[0][0][0];
   };
 }
 
