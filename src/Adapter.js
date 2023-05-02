@@ -14,6 +14,7 @@ class Adapter {
     const addFeatures = [];
     const options = [];
     const dealerIndexes = [];
+    const chat = []
     const sellerComment = content('.ReviewDetail_area_review_seller__o17ek.fs15.fcBlack2').text();
     const comment = content('.ReviewDetail_review_chat__3246N.fcBlack2').text();
     const vehicleName = content('.CarInfo_name__yMacL.fs16.fwBold').text();
@@ -38,6 +39,16 @@ class Adapter {
         dealerIndexes.push(text);
       });
 
+    const isChatAppear = content('.ReviewDetail_area_chat__Q9-uC').html();
+    if (isChatAppear) {
+      content('.ReviewDetail_area_chat__Q9-uC .ReviewDetail_chat__hYZaW')
+      .each(function(_index, message) {
+        const authName = content(message).find('[data-testid="dealerChatName"]').text();
+        const txtMsg = content(message).find('.ReviewDetail_review_chat__3246N.fcBlack2').text();
+        chat.push({ authName, txtMsg });
+      });
+    }
+
     const result = {
       "title": content('.ReviewDetail_area_car__vLgIZ.fs16.ReviewDetail_report__cdNg8').text(),
       "publicationDate": content('.ReviewDetail_time__2zU0I.fs14.fcBlack3').text(),
@@ -50,6 +61,7 @@ class Adapter {
         "dealerRate": dealerIndexes[1],
         "ratePer": content('.DealerInfo_sel_months__z6dPu.fs14.fcBlack3').text()
       },
+      "reviews": chat,
       "vehicle": {
         "mainInfo": {
           "title": vehicleName.replace(/\n/gmi, ' '),
