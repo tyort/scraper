@@ -1,4 +1,10 @@
+const { Translator } = require('./Translator');
+
 class Adapter {
+  constructor() {
+    this.translator = new Translator({original: 'ko', translation: 'ru'});
+  }
+
   getUntranslatableContent(content) {
     const pics = [];
     content('.PhotoSwipe_list__AsRzI button img')
@@ -9,14 +15,51 @@ class Adapter {
     return pics;
   }
 
-  getContent(content) {
+  async getContent(content) {
+    const arr = await this.getTranslatedContentArr(content);
+    return {
+      offerTitle: arr[0],
+      publicationDate: arr[1],
+      price: arr[2],
+      reviewSeller: arr[3],
+      sellerInfo: {
+        sellerName: arr[4],
+        sellerComapny: arr[5],
+        winningBets: arr[6],
+        sellerRate: arr[7],
+        ratePeriod: arr[8]
+      },
+      vehicleInfo: {
+        name: arr[9],
+        features: arr[17],
+        color: arr[10],
+        exchangeOrBuy: arr[11],
+        rentHistory: arr[12],
+        options: arr[16]
+      },
+      offerGrade: {
+        bestPrice: arr[13],
+        averagePrice: arr[14],
+        biddersCount: arr[15]
+      },
+      images: arr[18]
+    }
+  }
+
+  async getTranslatedContentArr(content) {
+    const contentArr = this.getContentArr(content);
+    const translatedContentArr = await Promise.all(
+      contentArr.map((item) => this.translator.getTranslation(item))
+    )
+    const otherContent = this.getUntranslatableContent(content);
+    return [...translatedContentArr, otherContent];
+  }
+
+  getContentArr(content) {
     const features = [];
     const addFeatures = [];
     const options = [];
     const dealerIndexes = [];
-    const chat = []
-    const sellerComment = content('.ReviewDetail_area_review_seller__o17ek.fs15.fcBlack2').text();
-    const comment = content('.ReviewDetail_review_chat__3246N.fcBlack2').text();
     const vehicleName = content('.CarInfo_name__yMacL.fs16.fwBold').text();
     content('.CarInfo_info__dlTdp.fs16.fcBlack2 .CarInfo_item__hBVr-')
       .each(function(_index, feature) {
@@ -39,49 +82,26 @@ class Adapter {
         dealerIndexes.push(text);
       });
 
-    const isChatAppear = content('.ReviewDetail_area_chat__Q9-uC').html();
-    if (isChatAppear) {
-      content('.ReviewDetail_area_chat__Q9-uC .ReviewDetail_chat__hYZaW')
-      .each(function(_index, message) {
-        const authName = content(message).find('[data-testid="dealerChatName"]').text();
-        const txtMsg = content(message).find('.ReviewDetail_review_chat__3246N.fcBlack2').text();
-        chat.push({ authName, txtMsg });
-      });
-    }
-
-    const result = {
-      "title": content('.ReviewDetail_area_car__vLgIZ.fs16.ReviewDetail_report__cdNg8').text(),
-      "publicationDate": content('.ReviewDetail_time__2zU0I.fs14.fcBlack3').text(),
-      "highestPrice": content('.ReviewDetail_price__CeeuP.fs14.fcBlack3').text(),
-      "sellerComment": sellerComment.replace(/\n/gmi, ' '),
-      "newDealer": {
-        "dealerName": content('[data-testid="dealerInfoName"]').text(),
-        "dalerCompany": content('.DealerInfo_company__r66ob.fs15.fcBlack2').text(),
-        "winningBets": dealerIndexes[0],
-        "dealerRate": dealerIndexes[1],
-        "ratePer": content('.DealerInfo_sel_months__z6dPu.fs14.fcBlack3').text()
-      },
-      "reviews": chat,
-      "vehicle": {
-        "mainInfo": {
-          "title": vehicleName.replace(/\n/gmi, ' '),
-          "features": features
-        },
-        "addInfo": {
-          "vehicleColor": addFeatures[0],
-          "exchangeBuy": addFeatures[1],
-          "rentHist": addFeatures[2]
-        },
-        "optionsList": options,
-        "costRatio": {
-          "bestCost": content('[data-testid="max"]').text(),
-          "averageCost": content('[data-testid="min"]').text(),
-          "biddersAmount": content('[data-testid="dealerCnt"]').text()
-        }
-      }
-    }
-
-    return JSON.stringify(result);
+    return [
+      content('.ReviewDetail_area_car__vLgIZ.fs16.ReviewDetail_report__cdNg8').text(),
+      content('.ReviewDetail_time__2zU0I.fs14.fcBlack3').text(),
+      content('.ReviewDetail_price__CeeuP.fs14.fcBlack3').text(),
+      content('.ReviewDetail_area_review_seller__o17ek.fs15.fcBlack2').text().replace(/\n/gmi, ' '),
+      content('[data-testid="dealerInfoName"]').text(),
+      content('.DealerInfo_company__r66ob.fs15.fcBlack2').text(),
+      dealerIndexes[0],
+      dealerIndexes[1],
+      content('.DealerInfo_sel_months__z6dPu.fs14.fcBlack3').text(),
+      vehicleName.replace(/\n/gmi, ' '),
+      addFeatures[0],
+      addFeatures[1],
+      addFeatures[2],
+      content('[data-testid="max"]').text(),
+      content('[data-testid="min"]').text(),
+      content('[data-testid="dealerCnt"]').text(),
+      options,
+      features
+    ];
   }
 }
 
