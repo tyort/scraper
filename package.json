@@ -9,6 +9,7 @@
   "author": "tyo sergey",
   "license": "ISC",
   "dependencies": {
+    "await-timeout": "1.1.1",
     "axios": "1.4.0",
     "cheerio": "1.0.0-rc.12",
     "express": "4.18.2",
