@@ -1,7 +1,9 @@
 const { Translator } = require('./Translator');
+const Timeout = require('await-timeout');
 
 class Adapter {
   constructor() {
+    this.timer = new Timeout();
     this.translator = new Translator({original: 'ko', translation: 'ru'});
   }
 
@@ -48,9 +50,12 @@ class Adapter {
 
   async getTranslatedContentArr(content) {
     const contentArr = this.getContentArr(content);
-    const translatedContentArr = await Promise.all(
-      contentArr.map((item) => this.translator.getTranslation(item))
-    )
+    const translatedContentArr = [];
+    for (const portion of contentArr) {
+      const res = await this.translator.getTranslation(portion);
+      await Timeout.set(200);
+      translatedContentArr.push(res);
+    }
     const otherContent = this.getUntranslatableContent(content);
     return [...translatedContentArr, otherContent];
   }
