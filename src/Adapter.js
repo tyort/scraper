@@ -1,19 +1,18 @@
-const { Translator } = require('./Translator');
-const Timeout = require('await-timeout');
+import Translator from './Translator.js'
+import Timeout from 'await-timeout';
 
 class Adapter {
   constructor() {
     this.timer = new Timeout();
-    this.translator = new Translator({original: 'ko', translation: 'ru'});
+    this.translator = new Translator({ original: 'ko', translation: 'ru' });
   }
 
   getUntranslatableContent(content) {
     const pics = [];
-    content('.PhotoSwipe_list__AsRzI button img')
-      .each(function(index, image) {
-        const srcData = content(image).attr('src');
-        pics.push(srcData);
-      });
+    content('.PhotoSwipe_list__AsRzI button img').each(function (index, image) {
+      const srcData = content(image).attr('src');
+      pics.push(srcData);
+    });
     return pics;
   }
 
@@ -29,7 +28,7 @@ class Adapter {
         sellerComapny: arr[5],
         winningBets: arr[6],
         sellerRate: arr[7],
-        ratePeriod: arr[8]
+        ratePeriod: arr[8],
       },
       vehicleInfo: {
         name: arr[9],
@@ -37,15 +36,15 @@ class Adapter {
         color: arr[10],
         exchangeOrBuy: arr[11],
         rentHistory: arr[12],
-        options: arr[16]
+        options: arr[16],
       },
       offerGrade: {
         bestPrice: arr[13],
         averagePrice: arr[14],
-        biddersCount: arr[15]
+        biddersCount: arr[15],
       },
-      images: arr[18]
-    }
+      images: arr[18],
+    };
   }
 
   async getTranslatedContentArr(content) {
@@ -66,38 +65,42 @@ class Adapter {
     const options = [];
     const dealerIndexes = [];
     const vehicleName = content('.CarInfo_name__yMacL.fs16.fwBold').text();
-    content('.CarInfo_info__dlTdp.fs16.fcBlack2 .CarInfo_item__hBVr-')
-      .each(function(_index, feature) {
+    content('.CarInfo_info__dlTdp.fs16.fcBlack2 .CarInfo_item__hBVr-').each(
+      function (_index, feature) {
         const text = content(feature).text();
         features.push(text);
-      });
-    content('table tr td')
-      .each(function(_index, feature) {
-        const text = content(feature).text();
-        addFeatures.push(text);
-      });
-    content('.CarInfo_options__wncbZ li ')
-      .each(function(_index, option) {
-        const text = content(option).text();
-        options.push(text);
-      });
-    content('.DealerInfo_sell_info__SdM1h.fs14.fcBlack2 li span')
-      .each(function(_index, item) {
+      }
+    );
+    content('table tr td').each(function (_index, feature) {
+      const text = content(feature).text();
+      addFeatures.push(text);
+    });
+    content('.CarInfo_options__wncbZ li ').each(function (_index, option) {
+      const text = content(option).text();
+      options.push(text);
+    });
+    content('.DealerInfo_sell_info__SdM1h.fs14.fcBlack2 li span').each(
+      function (_index, item) {
         const text = content(item).text();
         dealerIndexes.push(text);
-      });
+      }
+    );
 
     return [
-      content('.ReviewDetail_area_car__vLgIZ.fs16.ReviewDetail_report__cdNg8').text(),
+      content(
+        '.ReviewDetail_area_car__vLgIZ.fs16.ReviewDetail_report__cdNg8'
+      ).text(),
       content('.ReviewDetail_time__2zU0I.fs14.fcBlack3').text(),
       content('.ReviewDetail_price__CeeuP.fs14.fcBlack3').text(),
-      content('.ReviewDetail_area_review_seller__o17ek.fs15.fcBlack2').text().replace(/\n/gmi, ' '),
+      content('.ReviewDetail_area_review_seller__o17ek.fs15.fcBlack2')
+        .text()
+        .replace(/\n/gim, ' '),
       content('[data-testid="dealerInfoName"]').text(),
       content('.DealerInfo_company__r66ob.fs15.fcBlack2').text(),
       dealerIndexes[0],
       dealerIndexes[1],
       content('.DealerInfo_sel_months__z6dPu.fs14.fcBlack3').text(),
-      vehicleName.replace(/\n/gmi, ' '),
+      vehicleName.replace(/\n/gim, ' '),
       addFeatures[0],
       addFeatures[1],
       addFeatures[2],
@@ -105,11 +108,9 @@ class Adapter {
       content('[data-testid="min"]').text(),
       content('[data-testid="dealerCnt"]').text(),
       options,
-      features
+      features,
     ];
   }
 }
 
-module.exports = {
-  Adapter
-}
+export default Adapter;

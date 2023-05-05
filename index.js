@@ -1,7 +1,7 @@
-const express = require('express');
-const { Scraper } = require('./src/Scraper');
-const { Adapter } = require('./src/Adapter');
-const { Puppeteer } = require('./src/Puppeteer');
+import express from 'express';
+import Scraper from './src/Scraper.js';
+import Adapter from './src/Adapter.js';
+import Puppeteer from './src/Puppeteer.js';
 
 const PORT = 8000;
 const url = 'https://fem.encar.com/estimate/review-detail?id=97842';

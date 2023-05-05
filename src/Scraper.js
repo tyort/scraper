@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+import cheerio from 'cheerio';
 
 class Scraper {
   getAnalyzedData(content) {
@@ -6,6 +6,4 @@ class Scraper {
   }
 }
 
-module.exports = {
-  Scraper
-}
+export default Scraper

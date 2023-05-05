@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 class Translator {
   constructor({original, translation}) {
     this.url = `https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=${original}&tl=${translation}&q=`;
@@ -11,6 +11,4 @@ class Translator {
   };
 }
 
-module.exports = {
-  Translator
-}
+export default Translator

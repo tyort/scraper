@@ -8,8 +8,8 @@
     "extends": [
         "eslint:recommended",
         "some-other-config-you-use",
-        "prettier",
-        "plugin:prettier/recommended"
+        "plugin:prettier/recommended",
+        "prettier"
     ],
     "overrides": [
     ],
