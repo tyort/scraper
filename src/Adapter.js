@@ -1,4 +1,4 @@
-import Translator from './Translator.js'
+import Translator from './Translator.js';
 import Timeout from 'await-timeout';
 
 class Adapter {

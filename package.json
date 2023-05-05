@@ -5,7 +5,9 @@
   "description": "data parsing from encar.com",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "author": "tyo sergey",
   "license": "ISC",

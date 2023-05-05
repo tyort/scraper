@@ -6,4 +6,4 @@ class Scraper {
   }
 }
 
-export default Scraper
+export default Scraper;

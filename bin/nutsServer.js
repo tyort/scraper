@@ -9,7 +9,6 @@ const servers = [
 ];
 await servers.forEach(async (v) => {
   try {
-      
     const nc = await connect(v);
     console.log(`connected to ${nc.getServer()}`);
     // this promise indicates the client closed
