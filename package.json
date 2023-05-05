@@ -1,6 +1,7 @@
 {
   "name": "web-scraper",
   "version": "1.0.0",
+  "type": "module",
   "description": "data parsing from encar.com",
   "main": "index.js",
   "scripts": {
