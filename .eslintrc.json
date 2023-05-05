@@ -4,6 +4,7 @@
         "es2021": true,
         "node": true
     },
+    "plugins": ["prettier"],
     "extends": [
         "eslint:recommended",
         "some-other-config-you-use",
@@ -17,9 +18,12 @@
         "sourceType": "module"
     },
     "rules": {
+        "prettier/prettier": "error",
+        "arrow-body-style": "off",
+        "prefer-arrow-callback": "off",
         "indent": [
             "error",
-            2
+            1
         ],
         "linebreak-style": [
             "error",
