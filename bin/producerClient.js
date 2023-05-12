@@ -31,7 +31,7 @@ async function main() {
     const jsClient = await nc.jetstream();
 
     await jsClient.publish('encarSubj.unit', SC.encode(VEHICLE_URL), {
-      msgID: 'jnejcjeds2g3',
+      msgID: VEHICLE_URL.split('id=')[1],
       expect: { streamName: STREAM_NAME },
     });
 
