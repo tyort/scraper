@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon -r dotenv/config index.js localhost 8000",
-    "dev:nats-server": "nodemon -r dotenv/config bin/nutsServer.js",
+    "dev:nats-server": "nodemon -r dotenv/config bin/producerClient.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
