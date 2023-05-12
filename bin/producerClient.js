@@ -1,8 +1,10 @@
 import pkg from 'nats';
-const { connect, Empty, StringCodec } = pkg;
+const { connect, Empty, StringCodec, AckPolicy } = pkg;
+import { VEHICLE_URL } from '../src/const.js';
 
 const STREAM_NAME = 'encarStream';
 const SUBJECT = 'encarSubj.*';
+const DURABLE_NAME = 'encarDataConsumer';
 const SC = StringCodec();
 let nc;
 let jsm;
@@ -25,18 +27,25 @@ async function main() {
 
     jsm = await nc.jetstreamManager();
     await jsm.streams.add({ name: STREAM_NAME, subjects: [SUBJECT] });
+
     const jsClient = await nc.jetstream();
-    let pa = await jsClient.publish('encarSubj.D', Empty, {
-      msgID: '123asnfdk132',
+
+    await jsClient.publish('encarSubj.unit', SC.encode(VEHICLE_URL), {
+      msgID: 'jnejcjeds2g3',
       expect: { streamName: STREAM_NAME },
     });
 
-    console.log(pa);
+    // add a new durable pull consumer
+    await jsm.consumers.add(STREAM_NAME, {
+      durable_name: DURABLE_NAME,
+      ack_policy: AckPolicy.Explicit,
+      filter_subject: 'encarSubj.unit',
+    });
   } catch (err) {
     console.log(err);
   } finally {
-    await jsm.streams.delete(STREAM_NAME);
-    await nc.drain();
+    // await jsm.streams.delete(STREAM_NAME);
+    // await nc.drain();
   }
 }
 
