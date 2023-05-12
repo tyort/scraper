@@ -2,9 +2,7 @@ import express from 'express';
 import Scraper from './src/Scraper.js';
 import Adapter from './src/Adapter.js';
 import Puppeteer from './src/Puppeteer.js';
-
-const PORT = 8000;
-const url = 'https://fem.encar.com/estimate/review-detail?id=97842';
+import { VEHICLE_URL } from './src/const.js';
 
 const app = express();
 
@@ -14,7 +12,7 @@ const puppeteer = new Puppeteer();
 
 (async () => {
   try {
-    const content = await puppeteer.getPageContent(url);
+    const content = await puppeteer.getPageContent(VEHICLE_URL);
     const $ = scraper.getAnalyzedData(content);
     const translatedData = await adapter.getContent($);
     console.log(translatedData);
@@ -23,4 +21,6 @@ const puppeteer = new Puppeteer();
   }
 })();
 
-app.listen(PORT, () => console.log(`server running  on PORT ${PORT}`));
+app.listen(process.env.DEV_SERVER_PORT, () =>
+  console.log(`server running  on PORT ${process.env.DEV_SERVER_PORT}`)
+);
