@@ -5,7 +5,8 @@
   "description": "data parsing from encar.com",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "nodemon -r dotenv/config index.js localhost 8000",
+    "dev:nats-server": "nodemon -r dotenv/config bin/nutsServer.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -15,6 +16,7 @@
     "await-timeout": "1.1.1",
     "axios": "1.4.0",
     "cheerio": "1.0.0-rc.12",
+    "dotenv": "16.0.3",
     "express": "4.18.2",
     "nats": "2.13.1",
     "nodemon": "2.0.22",
