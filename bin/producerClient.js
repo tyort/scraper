@@ -15,7 +15,7 @@ async function main() {
   } catch (err) {
     console.log(err);
   } finally {
-    await natsService.deleteStream(STREAM_NAME);
+    // await natsService.deleteStream(STREAM_NAME);
     await natsService.connection.drain();
   }
 }
