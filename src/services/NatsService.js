@@ -40,6 +40,7 @@ class NatsService {
   }
 
   async publish(streamName, subj, message) {
+    await this.setJsc();
     if (!this.jsc) {
       return;
     }
@@ -62,6 +63,7 @@ class NatsService {
   }
 
   async addStream(streamName, subject) {
+    await this.setJsm();
     const currentStream = await this.findStream(streamName);
     if (!currentStream && this.jsm) {
       await this.jsm.streams.add({ name: streamName, subjects: [subject] });
