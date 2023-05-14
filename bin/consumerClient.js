@@ -20,7 +20,8 @@ async function main() {
     const res = await natsService.subscribe(
       PREFIX_SUBJECT,
       STREAM_NAME,
-      URL_RECIEVER
+      URL_RECIEVER,
+      'string'
     );
 
     if (!res.length) {

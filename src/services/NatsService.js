@@ -54,7 +54,7 @@ class NatsService {
     });
   }
 
-  async subscribe(subj, streamName, durable) {
+  async subscribe(subj, streamName, durable, msgType) {
     if (!this.jsc) {
       console.log('There is no jetstream client');
       return;
@@ -75,8 +75,9 @@ class NatsService {
       expires: 5000,
     });
 
+    const codec = msgType === 'string' ? StringCodec() : JSONCodec();
     for await (const m of msgs) {
-      messages.push(StringCodec().decode(m.data));
+      messages.push(codec.decode(m.data));
       // console.log(m.info);
       m.ack();
     }
