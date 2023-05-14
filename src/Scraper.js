@@ -1,8 +1,8 @@
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 
 class Scraper {
   getAnalyzedData(content) {
-    return cheerio.load(content);
+    return load(content);
   }
 }
 
