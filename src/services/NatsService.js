@@ -1,5 +1,5 @@
 import pkg from 'nats';
-const { connect, StringCodec } = pkg;
+const { connect, StringCodec, AckPolicy } = pkg;
 
 class NatsService {
   constructor() {
@@ -27,6 +27,7 @@ class NatsService {
 
   async setJsm() {
     if (!this.connection) {
+      console.log('There is no connection to nats-server');
       return;
     }
     this.jsm = await this.connection.jetstreamManager();
@@ -34,14 +35,15 @@ class NatsService {
 
   async setJsc() {
     if (!this.connection) {
+      console.log('There is no connection to nats-server');
       return;
     }
     this.jsc = await this.connection.jetstream();
   }
 
   async publish(streamName, subj, message) {
-    await this.setJsc();
     if (!this.jsc) {
+      console.log('There is no jetstream client');
       return;
     }
 
@@ -51,28 +53,49 @@ class NatsService {
     });
   }
 
+  async addConsumer(streamName, durableName, subj) {
+    if (!this.jsm) {
+      console.log('There is no jetstream manager');
+      return;
+    }
+    await this.jsm.consumers.add(streamName, {
+      durable_name: durableName,
+      ack_policy: AckPolicy.Explicit,
+      filter_subject: subj,
+    });
+  }
+
   async findStream(streamName) {
     if (!this.jsm) {
+      console.log('There is no jetstream manager');
       return;
     }
     try {
       return await this.jsm.streams.info(streamName);
     } catch (err) {
+      console.log(err.message);
       return err.message === 'stream not found' && null;
     }
   }
 
   async addStream(streamName, subject) {
-    await this.setJsm();
+    if (!this.jsm) {
+      console.log('There is no jetstream manager');
+      return;
+    }
     const currentStream = await this.findStream(streamName);
-    if (!currentStream && this.jsm) {
+    if (!currentStream) {
       await this.jsm.streams.add({ name: streamName, subjects: [subject] });
     }
   }
 
   async deleteStream(streamName) {
+    if (!this.jsm) {
+      console.log('There is no jetstream manager');
+      return;
+    }
     const currentStream = await this.findStream(streamName);
-    if (currentStream && this.jsm) {
+    if (currentStream) {
       await this.jsm.streams.delete(streamName);
     }
   }
