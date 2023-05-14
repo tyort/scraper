@@ -12,9 +12,7 @@ async function main() {
   try {
     await natsService.connect('consumer-connection');
     await natsService.setJsc();
-
-    const opts = consumerOpts();
-    opts.deliverTo('encar');
+    await natsService.setJsm();
 
     // let sub = await natsService.jsc.subscribe(CURRENT_SUBJECT, opts);
     // for await (const m of sub) {
@@ -22,12 +20,15 @@ async function main() {
     //   m.ack();
     // }
 
-    await natsService.jsc.pullSubscribe(CURRENT_SUBJECT, {
+    await natsService.jsm.consumers.add(STREAM_NAME, {
+      durable_name: DURABLE_NAME,
+      ack_policy: AckPolicy.Explicit,
+      filter_subject: CURRENT_SUBJECT,
+    });
+
+    await natsService.jsc.pullSubscribe('encarSubj.*', {
       mack: true,
-      // artificially low ack_wait, to show some messages
-      // not getting acked being redelivered
       config: {
-        durable_name: DURABLE_NAME,
         ack_policy: AckPolicy.Explicit,
         ack_wait: nanos(4000),
       },
@@ -40,7 +41,8 @@ async function main() {
 
     for await (const m of msgs) {
       console.log(StringCodec().decode(m.data));
-      // m.ack();
+      console.log(m.info);
+      m.ack();
     }
   } catch (err) {
     console.log(err);
