@@ -28,6 +28,8 @@ async function main() {
       throw new Error('There is no new messages from producer');
     }
 
+    console.log(res);
+
     for (const urlData of res) {
       const translatedData = await scrapeData.process(urlData);
       await natsService.publish(

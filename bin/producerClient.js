@@ -32,11 +32,23 @@ async function main() {
     );
 
     await natsService.addConsumer(STREAM_NAME, OBJ_RECIEVER, SUBJECT_OBJ);
+    const res = await natsService.subscribe(
+      PREFIX_SUBJECT,
+      STREAM_NAME,
+      OBJ_RECIEVER,
+      'object'
+    );
+
+    if (!res.length) {
+      throw new Error('There is no new messages from consumer');
+    }
+
+    console.log(res);
   } catch (err) {
     console.log(err);
   } finally {
     // await natsService.deleteStream(STREAM_NAME);
-    await natsService.connection.drain();
+    // await natsService.connection.drain();
   }
 }
 
