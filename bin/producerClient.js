@@ -12,6 +12,7 @@ async function main() {
     await natsService.connect('producer-connection');
     await natsService.addStream(STREAM_NAME, SUBJECT);
     await natsService.publish(STREAM_NAME, CURRENT_SUBJECT, VEHICLE_URL);
+    await natsService.publish(STREAM_NAME, 'encarSubj.test', 'what is this?');
   } catch (err) {
     console.log(err);
   } finally {
