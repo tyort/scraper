@@ -5,8 +5,10 @@ import {
   URL_RECIEVER,
 } from '../src/const.js';
 import NatsService from '../src/services/NatsService.js';
+import ScrapeData from '../src/usecases/ScrapeData.js';
 
 const natsService = new NatsService();
+const scrapeData = new ScrapeData();
 
 async function main() {
   try {
@@ -19,7 +21,17 @@ async function main() {
       STREAM_NAME,
       URL_RECIEVER
     );
-    console.log(res);
+
+    if (!res.length) {
+      throw new Error('There is no new messages from producer');
+    }
+
+    const translatedDataArr = [];
+    for (const urlData of res) {
+      const translatedData = await scrapeData.process(urlData);
+      translatedDataArr.push(translatedData);
+    }
+    console.log(translatedDataArr);
   } catch (err) {
     console.log(err);
   }
