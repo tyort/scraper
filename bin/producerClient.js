@@ -14,7 +14,13 @@ async function main() {
     await natsService.setJsm();
     await natsService.addStream(STREAM_NAME, PREFIX_SUBJECT);
     await natsService.setJsc();
-    await natsService.publish(STREAM_NAME, SUBJECT_URL, VEHICLE_URL);
+    await natsService.publish(
+      STREAM_NAME,
+      SUBJECT_URL,
+      VEHICLE_URL,
+      VEHICLE_URL.split('id=')[1],
+      'string'
+    );
     await natsService.publish(STREAM_NAME, 'encarSubj.test', 'what is this?');
   } catch (err) {
     console.log(err);

@@ -1,5 +1,5 @@
 import pkg from 'nats';
-const { connect, StringCodec, AckPolicy, nanos } = pkg;
+const { connect, StringCodec, JSONCodec, AckPolicy, nanos } = pkg;
 
 class NatsService {
   constructor() {
@@ -41,14 +41,15 @@ class NatsService {
     this.jsc = await this.connection.jetstream();
   }
 
-  async publish(streamName, subj, message) {
+  async publish(streamName, subj, message, msgID, msgType) {
     if (!this.jsc) {
       console.log('There is no jetstream client');
       return;
     }
 
-    await this.jsc.publish(subj, StringCodec().encode(message), {
-      msgID: message.split('id=')[1],
+    const codec = msgType === 'string' ? StringCodec() : JSONCodec();
+    await this.jsc.publish(subj, codec.encode(message), {
+      msgID,
       expect: { streamName: streamName },
     });
   }
