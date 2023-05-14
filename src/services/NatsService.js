@@ -1,5 +1,5 @@
 import pkg from 'nats';
-const { connect, StringCodec, AckPolicy } = pkg;
+const { connect, StringCodec, AckPolicy, nanos } = pkg;
 
 class NatsService {
   constructor() {
@@ -85,7 +85,11 @@ class NatsService {
     }
     const currentStream = await this.findStream(streamName);
     if (!currentStream) {
-      await this.jsm.streams.add({ name: streamName, subjects: [subject] });
+      await this.jsm.streams.add({
+        name: streamName,
+        subjects: [subject],
+        duplicate_window: nanos(4000),
+      });
     }
   }
 
