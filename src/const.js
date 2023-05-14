@@ -7,4 +7,8 @@ export const PREFIX_SUBJECT = 'encarSubj.*';
 
 export const SUBJECT_URL = 'encarSubj.url';
 
+export const SUBJECT_OBJ = 'encarSubj.offer';
+
 export const URL_RECIEVER = 'encarUrlSubscriber';
+
+export const OBJ_RECIEVER = 'encarObjSubscriber';

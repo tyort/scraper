@@ -3,6 +3,8 @@ import {
   STREAM_NAME,
   PREFIX_SUBJECT,
   SUBJECT_URL,
+  SUBJECT_OBJ,
+  OBJ_RECIEVER,
 } from '../src/const.js';
 import NatsService from '../src/services/NatsService.js';
 
@@ -21,7 +23,15 @@ async function main() {
       VEHICLE_URL.split('id=')[1],
       'string'
     );
-    await natsService.publish(STREAM_NAME, 'encarSubj.test', 'what is this?');
+    await natsService.publish(
+      STREAM_NAME,
+      'encarSubj.test',
+      'what is this?',
+      'ecwe323d',
+      'string'
+    );
+
+    await natsService.addConsumer(STREAM_NAME, OBJ_RECIEVER, SUBJECT_OBJ);
   } catch (err) {
     console.log(err);
   } finally {

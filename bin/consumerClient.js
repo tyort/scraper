@@ -3,6 +3,7 @@ import {
   PREFIX_SUBJECT,
   SUBJECT_URL,
   URL_RECIEVER,
+  SUBJECT_OBJ,
 } from '../src/const.js';
 import NatsService from '../src/services/NatsService.js';
 import ScrapeData from '../src/usecases/ScrapeData.js';
@@ -26,12 +27,23 @@ async function main() {
       throw new Error('There is no new messages from producer');
     }
 
-    const translatedDataArr = [];
     for (const urlData of res) {
       const translatedData = await scrapeData.process(urlData);
-      translatedDataArr.push(translatedData);
+      await natsService.publish(
+        STREAM_NAME,
+        SUBJECT_OBJ,
+        translatedData,
+        translatedData.id,
+        'object'
+      );
+      await natsService.publish(
+        STREAM_NAME,
+        'encarSubj.test',
+        'Hey, whats wrong?',
+        'asda2342sds',
+        'string'
+      );
     }
-    console.log(translatedDataArr);
   } catch (err) {
     console.log(err);
   }
