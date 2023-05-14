@@ -13,7 +13,7 @@ export default class ScrapeData {
     try {
       const content = await this.puppeteer.getPageContent(data);
       const $ = this.scraper.getAnalyzedData(content);
-      const translatedData = await this.adapter.getContent($);
+      const translatedData = await this.adapter.getContent($, data);
       return translatedData;
     } catch (err) {
       console.log(err);

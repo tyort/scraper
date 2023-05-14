@@ -16,9 +16,10 @@ class Adapter {
     return pics;
   }
 
-  async getContent(content) {
+  async getContent(content, url) {
     const arr = await this.getTranslatedContentArr(content);
     return {
+      id: url.split('id=')[1],
       offerTitle: arr[0],
       publicationDate: arr[1],
       price: arr[2],
