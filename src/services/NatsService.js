@@ -53,6 +53,36 @@ class NatsService {
     });
   }
 
+  async subscribe(subj, streamName, durable) {
+    if (!this.jsc) {
+      console.log('There is no jetstream client');
+      return;
+    }
+
+    const messages = [];
+
+    await this.jsc.pullSubscribe(subj, {
+      mack: true,
+      config: {
+        ack_policy: AckPolicy.Explicit,
+        ack_wait: nanos(4000),
+      },
+    });
+
+    let msgs = await this.jsc.fetch(streamName, durable, {
+      batch: 10,
+      expires: 5000,
+    });
+
+    for await (const m of msgs) {
+      messages.push(StringCodec().decode(m.data));
+      // console.log(m.info);
+      m.ack();
+    }
+
+    return messages;
+  }
+
   async addConsumer(streamName, durableName, subj) {
     if (!this.jsm) {
       console.log('There is no jetstream manager');
