@@ -66,19 +66,19 @@ class NatsService {
       mack: true,
       config: {
         ack_policy: AckPolicy.Explicit,
-        ack_wait: nanos(4000),
+        ack_wait: nanos(4000), // Как долго (в наносекундах) сообщения остаются неподтвержденными перед попыткой повторной доставки
       },
     });
 
     let msgs = await this.jsc.fetch(streamName, durable, {
-      batch: 10,
-      expires: 5000,
+      batch: 1, // Количество извлеченных сообщений за один запрос
+      expires: 500, // Сколько времени ждать получения этих сообщений
     });
 
     const codec = msgType === 'string' ? StringCodec() : JSONCodec();
     for await (const m of msgs) {
       messages.push(codec.decode(m.data));
-      // console.log(m.info);
+      console.log(m.info);
       m.ack();
     }
 
