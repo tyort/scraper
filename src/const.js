@@ -3,7 +3,7 @@ export const VEHICLE_URL =
 
 export const STREAM_NAME = 'encarStream';
 
-export const PREFIX_SUBJECT = 'encarSubj.*';
+export const PREFIX_SUBJECT = 'encarSubj.>';
 
 export const SUBJECT_URL = 'encarSubj.url';
 

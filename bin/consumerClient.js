@@ -18,10 +18,11 @@ async function main() {
     await natsService.setJsm();
     await natsService.addConsumer(STREAM_NAME, URL_RECIEVER, SUBJECT_URL);
     const res = await natsService.subscribe(
-      PREFIX_SUBJECT,
+      SUBJECT_URL,
       STREAM_NAME,
       URL_RECIEVER,
-      'string'
+      'string',
+      3000
     );
 
     if (!res.length) {
@@ -32,6 +33,7 @@ async function main() {
 
     for (const urlData of res) {
       const translatedData = await scrapeData.process(urlData);
+      console.log(translatedData);
       await natsService.publish(
         STREAM_NAME,
         SUBJECT_OBJ,
