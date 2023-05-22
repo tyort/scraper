@@ -72,7 +72,7 @@ class NatsService {
     });
 
     let msgs = await this.jsc.fetch(streamName, durable, {
-      batch: 10,
+      batch: 1,
       expires: commonTime,
     });
 
