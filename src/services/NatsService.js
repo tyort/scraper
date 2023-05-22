@@ -66,13 +66,13 @@ class NatsService {
       mack: true,
       config: {
         ack_policy: AckPolicy.Explicit,
-        ack_wait: nanos(4000),
+        ack_wait: nanos(1000),
       },
     });
 
     let msgs = await this.jsc.fetch(streamName, durable, {
       batch: 10,
-      expires: 5000,
+      expires: 100000,
     });
 
     const codec = msgType === 'string' ? StringCodec() : JSONCodec();
