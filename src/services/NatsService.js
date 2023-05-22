@@ -54,7 +54,7 @@ class NatsService {
     });
   }
 
-  async subscribe(subj, streamName, durable, msgType) {
+  async subscribe(subj, streamName, durable, msgType, commonTime) {
     if (!this.jsc) {
       console.log('There is no jetstream client');
       return;
@@ -67,27 +67,27 @@ class NatsService {
       config: {
         durable_name: durable,
         ack_policy: AckPolicy.Explicit,
-        ack_wait: nanos(1000), // Как долго (в наносекундах) сообщения остаются неподтвержденными(не вызван ack()) перед попыткой повторной доставки
+        ack_wait: nanos(500),
       },
     });
 
-    // Значения у msgs НЕ будет пока fetch не найдет сообщение publish
-    let msgs = this.jsc.fetch(streamName, durable, {
-      batch: 100, // Количество извлеченных сообщений за один запрос, т.е. msgs.length не более "этого" показателя
-      // Сколько времени ждать получения всех сообщений.
-      // По истечении этого времени мы уже не будем дожидаться ответа fetch, а чтение кода подйет дальше
-      expires: 100000,
+    let msgs = await this.jsc.fetch(streamName, durable, {
+      batch: 1,
+      expires: commonTime,
     });
 
     const codec = msgType === 'string' ? StringCodec() : JSONCodec();
     for await (const m of msgs) {
       messages.push(codec.decode(m.data));
       console.log(
-        m.redelivered
-          ? `Сообщение отправлено повторно ${m.info.redeliveryCount} раз`
-          : 'Новое сообщения'
+        `[${m.seq}] ${
+          m.redelivered ? `- redelivery ${m.info.redeliveryCount}` : ''
+        }`
       );
-      m.data && m.ack(); // Если не запустить метод, то сообщение будет доставлено повторно(redelivered)
+      // console.log(m.info);
+      if (m.data) {
+        m.ack();
+      }
     }
 
     return messages;
