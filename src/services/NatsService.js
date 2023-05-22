@@ -65,21 +65,29 @@ class NatsService {
     await this.jsc.pullSubscribe(subj, {
       mack: true,
       config: {
+        durable_name: durable,
         ack_policy: AckPolicy.Explicit,
-        ack_wait: nanos(4000), // Как долго (в наносекундах) сообщения остаются неподтвержденными перед попыткой повторной доставки
+        ack_wait: nanos(1000), // Как долго (в наносекундах) сообщения остаются неподтвержденными(не вызван ack()) перед попыткой повторной доставки
       },
     });
 
-    let msgs = await this.jsc.fetch(streamName, durable, {
-      batch: 1, // Количество извлеченных сообщений за один запрос
-      expires: 500, // Сколько времени ждать получения этих сообщений
+    // Значения у msgs НЕ будет пока fetch не найдет сообщение publish
+    let msgs = this.jsc.fetch(streamName, durable, {
+      batch: 100, // Количество извлеченных сообщений за один запрос, т.е. msgs.length не более "этого" показателя
+      // Сколько времени ждать получения всех сообщений.
+      // По истечении этого времени мы уже не будем дожидаться ответа fetch, а чтение кода подйет дальше
+      expires: 100000,
     });
 
     const codec = msgType === 'string' ? StringCodec() : JSONCodec();
     for await (const m of msgs) {
       messages.push(codec.decode(m.data));
-      console.log(m.info);
-      m.ack();
+      console.log(
+        m.redelivered
+          ? `Сообщение отправлено повторно ${m.info.redeliveryCount} раз`
+          : 'Новое сообщения'
+      );
+      m.data && m.ack(); // Если не запустить метод, то сообщение будет доставлено повторно(redelivered)
     }
 
     return messages;
