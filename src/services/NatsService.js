@@ -54,6 +54,93 @@ class NatsService {
     });
   }
 
+  // async NATSMessageQueuePrototypePullSubscribe(
+  //   ctx,
+  //   subject,
+  //   durable,
+  //   deleteMsgAfterAck,
+  //   handler
+  // ) {
+  //   const subjectParts = subject.split('.');
+  //   if (subjectParts.length <= 1) {
+  //     throw new Error(`invalid subject '${subject}'`);
+  //   }
+  //   const streamName = subjectParts.slice(0, -1).join('.');
+  //   try {
+  //     await mq.js.consumerInfo(streamName, durable);
+  //   } catch (err) {
+  //     if (err !== nats.ErrConsumerNotFound) {
+  //       throw new Error(`can't get consumer info: ${err}`);
+  //     }
+  //     await mq.js.addConsumer(streamName, {
+  //       durable: durable,
+  //       ackPolicy: nats.AckExplicitPolicy,
+  //     });
+  //   }
+
+  //   let sub = await mq.js.subscribe(subject, { durable_name: durable });
+  //   let waitBeforeFetch = false;
+  //   mq.wg.add(1);
+  //   mq.wg.done();
+  //   sub.unsubscribe();
+
+  //   while (true) {
+  //     if (mq.ctx.done) {
+  //       return mq.ctx.error;
+  //     } else if (ctx.done) {
+  //       return ctx.error;
+  //     }
+  //     if (waitBeforeFetch) {
+  //       if (mq.config.reconnectWait !== null) {
+  //         setTimeout(() => {
+  //           setTimeout(() => {
+  //             waitBeforeFetch = false;
+  //           }, mq.config.reconnectWait);
+  //         }, mq.config.reconnectWait);
+  //       } else {
+  //         setTimeout(() => {
+  //           waitBeforeFetch = false;
+  //         }, 30000);
+  //       }
+  //     }
+  //     let msgs, err;
+  //     [msgs, err] = sub.fetch(1, nats.Context(mq.ctx));
+  //     if (err !== null) {
+  //       if (
+  //         !err.includes(context.DeadlineExceeded) &&
+  //         !err.includes(context.Canceled)
+  //       ) {
+  //         mq.config.errorHandler(
+  //           new Error(`can't fetch from '${subject}': ${err}`)
+  //         );
+  //         waitBeforeFetch = true;
+  //       }
+  //       continue;
+  //     }
+
+  //     let msg = msgs[0];
+  //     msg.InProgress();
+  //     if (let err = handler(msg.Data)) {
+  //         if (mq.config.nakDelay != 0) {
+  //             msg.NakWithDelay(mq.config.nakDelay);
+  //         } else {
+  //             msg.Nak();
+  //         }
+  //         mq.config.errorHandler(new Error(`can't handle message from '${subject}': ${err}`));
+  //     } else {
+  //         msg.Ack();
+  //         if (deleteMsgAfterAck) {
+  //             let meta, err = msg.Metadata();
+  //             if (!err) {
+  //                 if (let err = mq.js.DeleteMsg(streamName, meta.Sequence.Stream)) {
+  //                     mq.config.errorHandler(new Error(`can't delete from '${subject}': ${err}`));
+  //                 }
+  //             }
+  //         }
+  //     }
+  //   }
+  // }
+
   async subscribe(subj, streamName, durable, msgType, commonTime) {
     if (!this.jsc) {
       console.log('There is no jetstream client');

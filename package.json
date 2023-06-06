@@ -8,6 +8,7 @@
     "start": "nodemon -r dotenv/config index.js localhost 8000",
     "dev:producer-server": "nodemon -r dotenv/config bin/producerClient.js",
     "dev:consumer-server": "nodemon -r dotenv/config bin/consumerClient.js",
+    "start:nats-server": "nats-server -c ./nats_server.conf",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
