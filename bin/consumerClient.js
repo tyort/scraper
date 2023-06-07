@@ -17,12 +17,12 @@ async function main() {
     await natsService.setJsc();
     await natsService.setJsm();
     await natsService.addConsumer(STREAM_NAME, URL_RECIEVER, SUBJECT_URL);
-    const res = await natsService.subscribe(
-      SUBJECT_URL,
+    await natsService.subscribe(SUBJECT_URL, URL_RECIEVER);
+    const res = await natsService.fetchMessages(
       STREAM_NAME,
       URL_RECIEVER,
-      'string',
-      3000
+      3000,
+      'string'
     );
 
     if (!res.length) {

@@ -66,18 +66,6 @@ class NatsService {
   //     throw new Error(`invalid subject '${subject}'`);
   //   }
   //   const streamName = subjectParts.slice(0, -1).join('.');
-  //   try {
-  //     await mq.js.consumerInfo(streamName, durable);
-  //   } catch (err) {
-  //     if (err !== nats.ErrConsumerNotFound) {
-  //       throw new Error(`can't get consumer info: ${err}`);
-  //     }
-  //     await mq.js.addConsumer(streamName, {
-  //       durable: durable,
-  //       ackPolicy: nats.AckExplicitPolicy,
-  //     });
-  //   }
-
   //   let sub = await mq.js.subscribe(subject, { durable_name: durable });
   //   let waitBeforeFetch = false;
   //   mq.wg.add(1);
@@ -141,13 +129,11 @@ class NatsService {
   //   }
   // }
 
-  async subscribe(subj, streamName, durable, msgType, commonTime) {
+  async subscribe(subj, durable) {
     if (!this.jsc) {
       console.log('There is no jetstream client');
       return;
     }
-
-    const messages = [];
 
     await this.jsc.pullSubscribe(subj, {
       mack: true,
@@ -157,11 +143,20 @@ class NatsService {
         ack_wait: nanos(500),
       },
     });
+  }
+
+  async fetchMessages(streamName, durable, commonTime, msgType) {
+    if (!this.jsc) {
+      console.log('There is no jetstream client');
+      return;
+    }
 
     let msgs = await this.jsc.fetch(streamName, durable, {
       batch: 1,
       expires: commonTime,
     });
+
+    const messages = [];
 
     const codec = msgType === 'string' ? StringCodec() : JSONCodec();
     for await (const m of msgs) {
@@ -185,11 +180,19 @@ class NatsService {
       console.log('There is no jetstream manager');
       return;
     }
-    await this.jsm.consumers.add(streamName, {
-      durable_name: durableName,
-      ack_policy: AckPolicy.Explicit,
-      filter_subject: subj,
-    });
+
+    try {
+      const consumer = await this.jsm.consumers.info(streamName, durableName);
+      console.log(consumer);
+    } catch (err) {
+      if (err.message === 'consumer not found') {
+        await this.jsm.consumers.add(streamName, {
+          durable_name: durableName,
+          ack_policy: AckPolicy.Explicit,
+          filter_subject: subj,
+        });
+      }
+    }
   }
 
   async findStream(streamName) {

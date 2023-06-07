@@ -32,12 +32,12 @@ async function main() {
     );
 
     await natsService.addConsumer(STREAM_NAME, OBJ_RECIEVER, SUBJECT_OBJ);
-    const res = await natsService.subscribe(
-      SUBJECT_OBJ,
+    await natsService.subscribe(SUBJECT_OBJ, OBJ_RECIEVER);
+    const res = await natsService.fetchMessages(
       STREAM_NAME,
       OBJ_RECIEVER,
-      'object',
-      120000
+      120000,
+      'object'
     );
 
     if (!res.length) {
