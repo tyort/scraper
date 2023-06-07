@@ -145,34 +145,16 @@ class NatsService {
     });
   }
 
-  async fetchMessages(streamName, durable, commonTime, msgType) {
+  fetchMessages(streamName, durable, commonTime) {
     if (!this.jsc) {
       console.log('There is no jetstream client');
       return;
     }
 
-    let msgs = await this.jsc.fetch(streamName, durable, {
+    return this.jsc.fetch(streamName, durable, {
       batch: 1,
       expires: commonTime,
     });
-
-    const messages = [];
-
-    const codec = msgType === 'string' ? StringCodec() : JSONCodec();
-    for await (const m of msgs) {
-      messages.push(codec.decode(m.data));
-      console.log(
-        `[${m.seq}] ${
-          m.redelivered ? `- redelivery ${m.info.redeliveryCount}` : ''
-        }`
-      );
-      // console.log(m.info);
-      if (m.data) {
-        m.ack();
-      }
-    }
-
-    return messages;
   }
 
   async addConsumer(streamName, durableName, subj) {
