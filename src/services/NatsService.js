@@ -157,6 +157,29 @@ class NatsService {
     });
   }
 
+  async getMessages(data, codecContent) {
+    const messages = [];
+    const codec = codecContent === 'string' ? StringCodec() : JSONCodec();
+    for await (const m of data) {
+      messages.push(codec.decode(m.data));
+      console.log(
+        `[${m.seq}] ${
+          m.redelivered ? `- redelivery ${m.info.redeliveryCount}` : ''
+        }`
+      );
+      // console.log(m.info);
+      if (m.data) {
+        m.ack();
+      }
+    }
+
+    if (!messages.length) {
+      throw new Error('There is no new messages from producer');
+    }
+
+    return messages;
+  }
+
   async addConsumer(streamName, durableName, subj) {
     if (!this.jsm) {
       console.log('There is no jetstream manager');

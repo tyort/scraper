@@ -1,5 +1,3 @@
-import pkg from 'nats';
-const { JSONCodec } = pkg;
 import {
   VEHICLE_URL,
   STREAM_NAME,
@@ -40,25 +38,7 @@ async function main() {
       OBJ_RECIEVER,
       120000
     );
-    const messages = [];
-
-    for await (const m of response) {
-      messages.push(JSONCodec().decode(m.data));
-      console.log(
-        `[${m.seq}] ${
-          m.redelivered ? `- redelivery ${m.info.redeliveryCount}` : ''
-        }`
-      );
-      // console.log(m.info);
-      if (m.data) {
-        m.ack();
-      }
-    }
-
-    if (!messages.length) {
-      throw new Error('There is no new messages from consumer');
-    }
-
+    const messages = await natsService.getMessages(response, 'object');
     console.log(messages);
   } catch (err) {
     console.log(err);

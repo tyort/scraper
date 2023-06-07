@@ -1,5 +1,3 @@
-import pkg from 'nats';
-const { StringCodec } = pkg;
 import {
   STREAM_NAME,
   PREFIX_SUBJECT,
@@ -21,25 +19,7 @@ async function main() {
     await natsService.addConsumer(STREAM_NAME, URL_RECIEVER, SUBJECT_URL);
     await natsService.subscribe(SUBJECT_URL, URL_RECIEVER);
     const response = natsService.fetchMessages(STREAM_NAME, URL_RECIEVER, 3000);
-    const messages = [];
-
-    for await (const m of response) {
-      messages.push(StringCodec().decode(m.data));
-      console.log(
-        `[${m.seq}] ${
-          m.redelivered ? `- redelivery ${m.info.redeliveryCount}` : ''
-        }`
-      );
-      // console.log(m.info);
-      if (m.data) {
-        m.ack();
-      }
-    }
-
-    if (!messages.length) {
-      throw new Error('There is no new messages from producer');
-    }
-
+    const messages = await natsService.getMessages(response, 'string');
     console.log(messages);
 
     for (const urlData of messages) {
