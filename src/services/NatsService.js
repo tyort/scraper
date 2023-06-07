@@ -173,10 +173,6 @@ class NatsService {
       }
     }
 
-    if (!messages.length) {
-      throw new Error('There is no new messages from producer');
-    }
-
     return messages;
   }
 

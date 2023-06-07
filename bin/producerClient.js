@@ -1,7 +1,6 @@
 import {
   VEHICLE_URL,
   STREAM_NAME,
-  PREFIX_SUBJECT,
   SUBJECT_URL,
   SUBJECT_OBJ,
   OBJ_RECIEVER,
@@ -14,7 +13,6 @@ async function main() {
   try {
     await natsService.connect('producer-connection');
     await natsService.setJsm();
-    await natsService.addStream(STREAM_NAME, PREFIX_SUBJECT);
     await natsService.setJsc();
     await natsService.publish(
       STREAM_NAME,
@@ -40,11 +38,9 @@ async function main() {
     );
     const messages = await natsService.getMessages(response, 'object');
     console.log(messages);
+    await natsService.connection.drain();
   } catch (err) {
     console.log(err);
-  } finally {
-    // await natsService.deleteStream(STREAM_NAME);
-    // await natsService.connection.drain();
   }
 }
 
